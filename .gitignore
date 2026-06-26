@@ -1,0 +1,30 @@
+# Virtual Environment
+venv/
+
+# Environment Variables
+.env
+
+# Python
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+
+# Jupyter
+.ipynb_checkpoints/
+
+# VS Code
+.vscode/
+
+# Logs
+logs/
+
+# Models
+*.pkl
+*.joblib
+
+# Vector Database
+vector_db/
+
+# macOS
+.DS_Store
