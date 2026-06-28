@@ -1,0 +1,66 @@
+AI COMPETITOR 
+
+
+#initial plan
+    CSV
+    │
+    ▼
+    Data Analysis
+    │
+    ▼
+    LLM explains findings
+    │
+    ▼
+    User discussion
+    │
+    ▼
+    Approved preprocessing plan
+    │
+    ▼
+    Apply transformations
+    │
+    ▼
+    Train models
+    │
+    ▼
+    Explain results
+
+STAGE 1 (Data Analysis using PYTHON)
+    For example
+        Rows: 10,000
+
+        Columns: 15
+
+        Missing Values:
+        Age : 20%
+        Salary : 15%
+
+        Duplicates:
+        123
+
+        Outliers:
+        Income
+        Fare
+
+        Categorical Columns:
+        Gender
+        City
+
+        Highly Correlated:
+        Height
+        Weight
+
+        Identifier Columns:
+        ID
+
+        Constant Columns:
+        CountryCode
+
+        Target:
+        Purchased
+
+STAHE 2 (AI REVIEW using LLM)
+    You are an experienced Machine Learning Engineer. Analyze the following dataset summary. Recommend preprocessing steps and explain why.
+
+STAGE 3 (USER discussion)
+    Now here user validates the changes may suggest some or changes and we finalize the final actions 

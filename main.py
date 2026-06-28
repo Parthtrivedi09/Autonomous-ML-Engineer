@@ -1,25 +1,20 @@
-from models.llm import llm
-from models.embeddings import embeddings
+from tools.data_loader import DataLoader
+from tools.data_profiler import DataProfiler
 
 
 def main():
 
-    print("Testing LLM...")
+    loader = DataLoader()
 
-    response = llm.invoke("Who is Virat Kohli?")
+    df = loader.load_csv("data/raw/titanic.csv")
 
-    print(response.content)
+    profiler = DataProfiler(df)
 
-    print()
+    report = profiler.generate_report()
 
-    print("Testing Embeddings...")
-
-    embedding = embeddings.embed_query("Who is Virat Kohli?")
-
-    print("Embedding Dimension:", len(embedding))
-
-    print(embedding[:10])
+    print(report)
 
 
 if __name__ == "__main__":
     main()
+    

@@ -1,0 +1,50 @@
+The Interview Objection
+
+Suppose an interviewer asks:
+
+"Why not just upload the CSV to ChatGPT?"
+
+The wrong answer is:
+
+"Because my prompts are better."
+
+That isn't convincing.
+
+Instead:
+
+A single LLM generates responses, but it doesn't execute a structured ML workflow. AutoML Studio separates responsibilities across specialized agents. Each agent has a focused task, reducing hallucinations and improving decision quality. Python performs deterministic operations such as EDA, preprocessing, model training, and evaluation, while the LLM reasons over those results, recommends next steps, and coordinates the pipeline. The platform also maintains workflow state, supports user validation, and can retrieve relevant ML knowledge through RAG, making it reproducible and extensible rather than just a one-off conversation.
+
+That answer immediately shifts the discussion from "LLM vs. LLM" to "product architecture."
+
+
+
+AutoML Studio is a multi-agent AI platform that collaborates with the user to build high-quality machine learning pipelines. Instead of automatically generating code, it reasons through each stage of the ML lifecycle, validates decisions with the user, retrieves relevant knowledge through RAG, executes deterministic ML operations in Python, and iteratively improves the pipeline until satisfactory performance is achieved.
+
+
+
+Q Why not LLM upload the dataset?
+Problems
+        Imagine your dataset has:
+
+        100,000 rows
+
+        50 columns
+
+        That's millions of values.
+
+        Problems:
+
+        Doesn't fit in the context window.
+
+        Very expensive.
+
+        Slow.
+
+        The LLM may miss patterns or summarize inaccurately.
+
+        So this approach doesn't scale.
+    
+    SOLUTION -> Python computes statistics, LLM writes the report ✅ (Most common)
+
+
+
