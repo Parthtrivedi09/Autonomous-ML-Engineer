@@ -18,6 +18,11 @@ That answer immediately shifts the discussion from "LLM vs. LLM" to "product arc
 
 
 
+are llm good at analyzing large datasets (raw) consisting of lakhs of rows11:13 PMClaude responded: Short answer: not directly, and here's why.Short answer: not directly, and here's why.
+The Core Limitation
+LLMs have a context window limit — even the largest models (with 200K–1M token windows) can't ingest millions of rows of raw tabular data. A single row with 10 columns might take 20–50 tokens; 1 lakh rows = ~2–5 million tokens. That's way beyond any current model's window, and even if it fit, the model would struggle to "see" patterns across that volume.
+
+
 AutoML Studio is a multi-agent AI platform that collaborates with the user to build high-quality machine learning pipelines. Instead of automatically generating code, it reasons through each stage of the ML lifecycle, validates decisions with the user, retrieves relevant knowledge through RAG, executes deterministic ML operations in Python, and iteratively improves the pipeline until satisfactory performance is achieved.
 
 
