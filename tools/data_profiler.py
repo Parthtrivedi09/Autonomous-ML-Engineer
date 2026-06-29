@@ -296,18 +296,16 @@ class DataProfiler:
 
     def get_correlations(self, threshold=0.8):
         """
-        Finds highly correlated numeric feature pairs.
+        Finds highly correlated pairs of numeric features.
 
         Why?
 
-        Highly correlated features may contain redundant information.
-        Instead of sending the entire correlation matrix to the LLM,
-        we only return feature pairs whose absolute correlation is
-        greater than or equal to the threshold.
+        Highly correlated features often contain redundant information,
+        which may lead to multicollinearity in certain machine learning models.
 
-        Parameters:
-            threshold (float): Minimum absolute correlation value
-                            to be reported.
+        Instead of returning the complete correlation matrix,
+        we only return feature pairs whose absolute correlation
+        is greater than or equal to the specified threshold.
         """
 
         correlation_report = []
@@ -315,18 +313,32 @@ class DataProfiler:
         # Select only numeric columns
         numeric_df = self.df.select_dtypes(include=["number"])
 
+        # If there is only one numeric column,
+        # correlation analysis is not possible.
+        if numeric_df.shape[1] < 2:
+            return correlation_report
+
         # Compute correlation matrix
-        corr_matrix = numeric_df.corr()
+        correlation_matrix = numeric_df.corr()
 
-        columns = corr_matrix.columns
+        columns = correlation_matrix.columns
 
-        # Iterate over the upper triangle of the matrix
+        # Iterate over only the upper triangle
+        # to avoid duplicate pairs.
         for i in range(len(columns)):
             for j in range(i + 1, len(columns)):
 
-                correlation = corr_matrix.iloc[i, j]
+                corr_value = correlation_matrix.iloc[i, j]
 
-                if abs(correlation) >= threshold:
+                if abs(corr_value) >= threshold:
+
+                    # Classify correlation strength
+                    if abs(corr_value) >= 0.95:
+                        strength = "Very Strong"
+                    elif abs(corr_value) >= 0.90:
+                        strength = "Strong"
+                    else:
+                        strength = "Moderate"
 
                     correlation_report.append({
 
@@ -334,7 +346,9 @@ class DataProfiler:
 
                         "feature_2": columns[j],
 
-                        "correlation": round(float(correlation), 2)
+                        "correlation": round(float(corr_value), 2),
+
+                        "strength": strength
 
                     })
 
