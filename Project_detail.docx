@@ -78,3 +78,9 @@ Professional Dataset Audit
 
 
 
+We got partially cleaned dataset after phase 2 (Tool available= Delete colums,Delete Duplicates, insert median at missing values, Inset mode at missing values)
+
+
+PHASE 1 + PHASE 2 -> PIPELINE in the documents only
+
+
