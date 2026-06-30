@@ -52,4 +52,29 @@ Problems
     SOLUTION -> Python computes statistics, LLM writes the report ✅ (Most common)
 
 
+PHASE 1
+
+User
+
+↓
+
+Upload CSV
+
+↓
+
+Python Data Profiler
+
+↓
+
+Structured Dataset Report
+
+↓
+
+LLM Analysis Agent
+
+↓
+
+Professional Dataset Audit
+
+
 
