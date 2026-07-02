@@ -1,24 +1,30 @@
 from tools.data_loader import DataLoader
 from tools.data_profiler import DataProfiler
+from tools.target_manager import TargetManager
+from tools.feature_profiler import FeatureProfiler
 
 from agents.analysis_agent import AnalysisAgent
 from agents.validation_agent import ValidationAgent
+from agents.feature_engineering_agent import FeatureEngineeringAgent
+from agents.feature_validation_agent import FeatureValidationAgent
 
 from tools.operation_executor import OperationExecutor
+from tools.feature_executor import FeatureExecutor
+
 import json
 
 
 def main():
 
-    print("=" * 50)
-    print("           AutoML Studio")
-    print("=" * 50)
+    print("=" * 60)
+    print("                 AutoML Studio")
+    print("=" * 60)
 
     dataset_path = input("Enter Dataset Path: ")
 
-    # --------------------------------------------------
-    # Load Dataset
-    # --------------------------------------------------
+    # ======================================================
+    # Phase 1 : Load Dataset
+    # ======================================================
 
     loader = DataLoader()
 
@@ -26,17 +32,13 @@ def main():
 
     print("\nDataset Loaded Successfully.")
 
-    # --------------------------------------------------
-    # Generate Dataset Report
-    # --------------------------------------------------
+    # ======================================================
+    # Phase 1 : Dataset Analysis
+    # ======================================================
 
     profiler = DataProfiler(df)
 
     report = profiler.generate_report()
-
-    # --------------------------------------------------
-    # AI Analysis
-    # --------------------------------------------------
 
     print("\nGenerating AI Recommendations...\n")
 
@@ -46,37 +48,27 @@ def main():
 
     print(recommendations)
 
-    # --------------------------------------------------
-    # User Validation
-    # --------------------------------------------------
+    # ======================================================
+    # Phase 2 : User Validation
+    # ======================================================
 
-    print("\n" + "=" * 50)
-
+    print("\n" + "=" * 60)
     print("Review the recommendations above.")
-
     print("Example:")
-
     print("Keep Cabin.")
-
     print("Drop PassengerId.")
-
     print("Also remove Ticket.")
-
-    print("=" * 50)
+    print("=" * 60)
 
     user_response = input("\nYour Decisions:\n\n")
-
-    # --------------------------------------------------
-    # Validation Agent
-    # --------------------------------------------------
 
     validation_agent = ValidationAgent()
 
     operations = validation_agent.generate_operations(
-    report,
-    recommendations,
-    user_response
-)
+        report,
+        recommendations,
+        user_response
+    )
 
     if operations is None:
 
@@ -84,42 +76,147 @@ def main():
 
         return
 
-    print("\nOperations Generated Successfully.\n")
+    print("\nGenerated Operations\n")
 
     print(json.dumps(
-    operations,
-    indent=4
+        operations,
+        indent=4
     ))
 
-    # --------------------------------------------------
-    # Execute Operations
-    # --------------------------------------------------
+    # ======================================================
+    # Phase 2 : Execute Cleaning
+    # ======================================================
 
     executor = OperationExecutor(df)
 
-    executor.execute(operations["operations"])
-
-    # --------------------------------------------------
-    # Save Dataset
-    # --------------------------------------------------
-
-    executor.save_dataset(
-
-        "data/processed/cleaned_dataset.csv"
-
+    cleaned_df = executor.execute(
+        operations["operations"]
     )
 
-    print("\nDataset Saved Successfully.")
+    executor.save_dataset(
+        "data/processed/cleaned_dataset.csv"
+    )
 
-    # --------------------------------------------------
-    # Show Log
-    # --------------------------------------------------
+    print("\nCleaning Completed Successfully.")
 
     print("\nOperations Performed\n")
 
     for log in executor.get_logs():
 
         print(log)
+
+    # ======================================================
+    # Phase 3 : Target Selection
+    # ======================================================
+
+    print("\n" + "=" * 60)
+    print("FEATURE ENGINEERING PHASE")
+    print("=" * 60)
+
+    target = input(
+        "\nEnter Target Column : "
+    )
+
+    manager = TargetManager(
+        cleaned_df
+    )
+
+    if not manager.validate_target(target):
+
+        print("\nInvalid Target Column.")
+
+        return
+
+    problem_type = manager.get_problem_type(
+        target
+    )
+
+    print(f"\nDetected Problem Type : {problem_type}")
+
+    # ======================================================
+    # Phase 3 : Feature Profiling
+    # ======================================================
+
+    feature_profiler = FeatureProfiler(
+        dataframe=cleaned_df,
+        target_column=target
+    )
+
+    feature_report = feature_profiler.generate_report()
+
+    # ======================================================
+    # Phase 3 : AI Feature Engineering
+    # ======================================================
+
+    feature_agent = FeatureEngineeringAgent()
+
+    feature_recommendations = feature_agent.analyze(
+        feature_report,
+        problem_type
+    )
+
+    print("\n")
+
+    print(feature_recommendations)
+
+    # ======================================================
+    # Phase 3 : User Validation
+    # ======================================================
+
+    user_response = input(
+        "\nYour Decisions:\n\n"
+    )
+
+    feature_validator = FeatureValidationAgent()
+
+    feature_operations = feature_validator.generate_operations(
+        feature_report,
+        problem_type,
+        feature_recommendations,
+        user_response
+    )
+    if feature_operations is None:
+
+        print("\nFailed to understand feature engineering instructions.")
+
+        return
+
+    print("\nGenerated Feature Operations\n")
+
+    print(json.dumps(
+        feature_operations,
+        indent=4
+    ))
+
+    # ======================================================
+    # Phase 3 : Execute Feature Engineering
+    # ======================================================
+
+    feature_executor = FeatureExecutor(
+        cleaned_df
+    )
+
+    final_df = feature_executor.execute(
+        feature_operations["operations"]
+    )
+
+    # Save Feature Engineered Dataset
+    feature_executor.save_dataset(
+        "data/processed/feature_engineered_dataset.csv"
+    )
+
+    print("\nFeature Engineering Completed Successfully.")
+
+    print("\nOperations Performed\n")
+
+    for log in feature_executor.get_logs():
+
+        print(log)
+
+    print("\n")
+    print("=" * 60)
+    print("AutoML Studio Phase 3 Completed Successfully.")
+    print("=" * 60)
 
 
 if __name__ == "__main__":

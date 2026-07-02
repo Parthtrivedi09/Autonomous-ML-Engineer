@@ -27,6 +27,26 @@ AutoML Studio is a multi-agent AI platform that collaborates with the user to bu
 
 
 
+THIS IS WHAT WE ARE DOING IN THE WHOLE PROJECT:
+    Python Analysis
+
+        ↓
+
+    LLM Reasoning
+
+        ↓
+
+    Human Validation
+
+        ↓
+
+    Python Execution
+
+    Looping it in every phase
+
+
+
+
 Q Why not LLM upload the dataset?
 Problems
         Imagine your dataset has:
