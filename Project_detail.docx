@@ -1,3 +1,8 @@
+The LLM do not requires the raw data it just requires the data analysis
+to suggest you the changes,models, etc.
+
+
+
 The Interview Objection
 
 Suppose an interviewer asks:
@@ -104,3 +109,18 @@ We got partially cleaned dataset after phase 2 (Tool available= Delete colums,De
 PHASE 1 + PHASE 2 -> PIPELINE in the documents only
 
 
+
+Just completed the phase 3 and now the flow looks something like aalso have added the image in folder itself
+
+
+After phase 3 we have model ready dataset
+
+
+Phase 4 -> Model selection
+
+
+
+So there is a very critical bug that came while designing the pipeline of data cleaning when Imagine
+completed the phase 5 I saw that the mmodel removed 116 rows in the testing dataset so when i went through
+it, the problem came out when I removed the NAME, ID column there were many rows which became similar 
+due to which the model said that they are duplicates and removed them where as they have the assence of the data

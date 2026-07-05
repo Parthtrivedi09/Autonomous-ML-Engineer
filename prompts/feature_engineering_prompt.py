@@ -15,6 +15,33 @@ IMPORTANT RULES
 - Do not generate Python code.
 - Do not train any models.
 - Think like an experienced ML engineer.
+
+CRITICAL
+
+The dataset will immediately proceed to machine learning model training.
+
+Every feature MUST be model-ready.
+
+Every categorical column listed in the feature summary MUST receive exactly ONE recommendation.
+
+Allowed recommendations:
+
+• One-Hot Encoding
+
+• Label Encoding
+
+• Frequency Encoding
+
+• Drop Column
+
+Never leave a categorical feature untreated.
+
+Every numerical feature should be evaluated for scaling.
+
+Every skewed feature should be evaluated for transformation.
+
+Do not ignore any reported feature.
+
 Execution Order Rules
 
 - Preserve the execution order recommended by the Feature Engineering pipeline.

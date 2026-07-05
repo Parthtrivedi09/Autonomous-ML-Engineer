@@ -11,6 +11,18 @@ from agents.feature_validation_agent import FeatureValidationAgent
 from tools.operation_executor import OperationExecutor
 from tools.feature_executor import FeatureExecutor
 
+
+from tools.model_executor import ModelExecutor
+from tools.model_profiler import ModelProfiler
+from agents.model_selection_agent import ModelSelectionAgent
+from agents.model_validation_agent import ModelValidationAgent
+
+
+from tools.training_executor import TrainingExecutor
+
+from agents.evaluation_agent import EvaluationAgent
+
+
 import json
 
 
@@ -219,5 +231,136 @@ def main():
     print("=" * 60)
 
 
+    # ======================================================
+    # Phase 4 : Model Selection
+    # ======================================================
+
+    model_profiler = ModelProfiler(
+        final_df,
+        target,
+        problem_type
+    )
+
+    model_report = model_profiler.generate_report()
+
+    model_agent = ModelSelectionAgent()
+
+    model_recommendations = model_agent.analyze(
+        model_report
+    )
+
+    print(model_recommendations)
+
+    user_response = input(
+        "\nYour Decisions:\n\n"
+    )
+
+    validator = ModelValidationAgent()
+
+    selected_models = validator.generate_models(
+        problem_type,
+        model_recommendations,
+        user_response
+    )
+
+    if selected_models is None:
+
+        print("Unable to understand model selection.")
+
+        return
+
+    executor = ModelExecutor()
+
+    executor.execute(
+        selected_models["models"]
+    )
+
+    print("\nSelected Models\n")
+
+    for model in executor.get_models():
+
+        print(model)
+    
+        # ======================================================
+    # Phase 5 : Model Training & Evaluation
+    # ======================================================
+
+    print("\n" + "=" * 60)
+    print("MODEL TRAINING & EVALUATION")
+    print("=" * 60)
+
+    training_executor = TrainingExecutor(
+
+        final_df,
+
+        target,
+
+        problem_type
+
+    )
+
+    results = training_executor.train_models(
+
+        executor.get_models()
+
+    )
+
+    print("\n")
+
+    print("=" * 60)
+    print("BASELINE MODEL METRICS")
+    print("=" * 60)
+
+    metrics_report = {}
+
+    for model in results:
+
+        metrics_report[model] = results[model]["metrics"]
+
+    print(
+
+        json.dumps(
+
+            metrics_report,
+
+            indent=4
+
+        )
+
+    )
+
+    # ======================================================
+    # AI Evaluation
+    # ======================================================
+
+    evaluation_agent = EvaluationAgent()
+
+    evaluation_report = evaluation_agent.analyze(
+
+        problem_type,
+
+        metrics_report
+
+    )
+    training_executor.save_models()
+
+    print("\n")
+
+    print("=" * 60)
+    print("AI MODEL EVALUATION")
+    print("=" * 60)
+
+    print(evaluation_report)
+
+    print("\n")
+    print("=" * 60)
+    print("AutoML Studio Phase 5 Completed Successfully.")
+    print("=" * 60)
+
+
 if __name__ == "__main__":
     main()
+
+
+
+
