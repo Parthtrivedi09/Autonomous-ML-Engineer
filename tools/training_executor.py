@@ -9,16 +9,18 @@ class TrainingExecutor:
     """
     Responsible for:
 
-    1. Training all selected models.
-    2. Evaluating every model.
-    3. Collecting all results.
-    4. Saving trained model artifacts.
+    1. Training all selected baseline models.
+    2. Evaluating every baseline model.
+    3. Collecting experiment results.
+    4. Preserving train/test data for later phases.
+    5. Saving trained model artifacts.
 
     IMPORTANT:
+
     It does NOT decide which model is best.
 
-    The Evaluation Agent compares the computed metrics
-    and recommends the model for the next phase.
+    The Evaluation Agent compares the Python-computed
+    metrics and selects the model for Phase 6.
     """
 
     def __init__(
@@ -30,23 +32,29 @@ class TrainingExecutor:
 
         self.problem_type = problem_type
 
-        # Tool responsible only for model training
+        # ---------------------------------------------
+        # Model training component
+        # ---------------------------------------------
+
         self.training_tool = ModelTrainingTool(
             dataframe,
             target_column,
             problem_type
         )
 
-        # Tool responsible only for metric computation
+        # ---------------------------------------------
+        # Metric computation component
+        # ---------------------------------------------
+
         self.evaluation_tool = EvaluationTool(
             problem_type
         )
 
-        # Stores training outputs for every model
+        # Stores complete experiment results
         self.results = {}
 
     # =====================================================
-    # Train All Models
+    # Train All Selected Models
     # =====================================================
 
     def train_models(
@@ -54,23 +62,24 @@ class TrainingExecutor:
         model_list
     ):
 
-        # Reset previous results in case this method
-        # is called more than once
+        # Reset results if method is called again
         self.results = {}
 
         for model_name in model_list:
 
-            print(f"\nTraining {model_name}...")
+            print(
+                f"\nTraining {model_name}..."
+            )
 
-            # ---------------------------------------------
-            # Train model and generate predictions
-            # ---------------------------------------------
+            # -----------------------------------------
+            # Train baseline model
+            # -----------------------------------------
 
             output = self.training_tool.train_model(
                 model_name
             )
 
-            # Unsupported or failed model
+            # Skip unsupported model
             if output is None:
 
                 print(
@@ -80,9 +89,9 @@ class TrainingExecutor:
 
                 continue
 
-            # ---------------------------------------------
-            # Compute evaluation metrics
-            # ---------------------------------------------
+            # -----------------------------------------
+            # Compute baseline metrics
+            # -----------------------------------------
 
             metrics = self.evaluation_tool.evaluate(
                 output["y_test"],
@@ -90,22 +99,32 @@ class TrainingExecutor:
                 output["y_prob"]
             )
 
-            # ---------------------------------------------
+            # -----------------------------------------
             # Store complete experiment result
-            # ---------------------------------------------
+            # -----------------------------------------
 
             self.results[model_name] = {
 
+                # Trained baseline estimator
                 "model": output["model"],
 
+                # Python-computed metrics
                 "metrics": metrics,
 
-                "X_test": output["X_test"],
+                # Training partition
+                # Used later by GridSearchCV
+                "X_train": output["X_train"],
+                "y_train": output["y_train"],
 
+                # Untouched test partition
+                # Used for final tuned evaluation
+                "X_test": output["X_test"],
                 "y_test": output["y_test"],
 
+                # Baseline predictions
                 "y_pred": output["y_pred"],
 
+                # Baseline probabilities
                 "y_prob": output["y_prob"]
 
             }
@@ -125,10 +144,29 @@ class TrainingExecutor:
 
             return None
 
-        return self.results[model_name]["model"]
+        return self.results[
+            model_name
+        ]["model"]
 
     # =====================================================
-    # Save All Trained Models
+    # Get Complete Result For One Model
+    # =====================================================
+
+    def get_model_result(
+        self,
+        model_name
+    ):
+
+        if model_name not in self.results:
+
+            return None
+
+        return self.results[
+            model_name
+        ]
+
+    # =====================================================
+    # Save All Baseline Models
     # =====================================================
 
     def save_models(
@@ -136,7 +174,6 @@ class TrainingExecutor:
         folder="artifacts/models"
     ):
 
-        # Create folder if it does not exist
         os.makedirs(
             folder,
             exist_ok=True
@@ -157,7 +194,7 @@ class TrainingExecutor:
         return True
 
     # =====================================================
-    # Get Results
+    # Get All Results
     # =====================================================
 
     def get_results(self):

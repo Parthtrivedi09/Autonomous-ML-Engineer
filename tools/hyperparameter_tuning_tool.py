@@ -199,12 +199,24 @@ class HyperparameterTuningTool:
     # Scoring Strategy
     # =====================================================
 
-    def get_scoring_metric(self):
+    def get_scoring_metric(
+    self,
+    y_train
+):
 
         if self.problem_type == "Classification":
 
-            return "f1"
+            unique_classes = y_train.nunique()
 
+            # Binary classification
+            if unique_classes == 2:
+
+                return "f1"
+
+            # Multiclass classification
+            return "f1_weighted"
+
+        # Regression
         return "neg_mean_squared_error"
 
     # =====================================================
@@ -240,7 +252,9 @@ class HyperparameterTuningTool:
         # Select scoring strategy
         # ---------------------------------------------
 
-        scoring = self.get_scoring_metric()
+        scoring = self.get_scoring_metric(
+    y_train
+)
 
         # ---------------------------------------------
         # Create GridSearchCV
